@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OWASP Risk Calculator</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.4.1/dist/chart.min.js"></script>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">OWASP Risk Calculator</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Home</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <canvas id="myChart" class="mb-5"></canvas>
+
+        <div class="row">
+            <div class="col-md-6">
+                <h4>Threat Agent Factors</h4>
+                <div class="form-group">
+                    <label for="sl">Skill Level</label>
+                    <select id="sl" class="form-control" onchange="calc_score()">
+                        <option value="1">No Technical Skills</option>
+                        <option value="3">Some Technical Skills</option>
+                        <option value="5">Advanced Computer User</option>
+                        <option value="6">Network And Programming Skills</option>
+                        <option value="9">Security Penetration Skills</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="motive">Motive</label>
+                    <select id="motive" class="form-control" onchange="calc_score()">
+                        <option value="1">Low Or No Reward</option>
+                        <option value="4">Possible Reward</option>
+                        <option value="9">High Reward</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="oppor">Opportunity</label>
+                    <select id="oppor" class="form-control" onchange="calc_score()">
+                        <option value="0">Full Access/Expensive Resources Required</option>
+                        <option value="4">Special Access Or Resources Required</option>
+                        <option value="7">Some Access Or Resources Required</option>
+                        <option value="9">No Access Or Resources Required</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="size">Size</label>
+                    <select id="size" class="form-control" onchange="calc_score()">
+                        <option value="2">Developers</option>
+                        <option value="2">System Administrators</option>
+                        <option value="4">Intranet Users</option>
+                        <option value="5">Partners</option>
+                        <option value="6">Authenticated Users</option>
+                        <option value="9">Anonymous Internet Users</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Vulnerability Factors</h4>
+                <div class="form-group">
+                    <label for="eod">Ease of Discovery</label>
+                    <select id="eod" class="form-control" onchange="calc_score()">
+                        <option value="1">Practically impossible</option>
+                        <option value="3">Difficult</option>
+                        <option value="7">Easy</option>
+                        <option value="9">Automated Tools available</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="eoe">Ease of Exploit</label>
+                    <select id="eoe" class="form-control" onchange="calc_score()">
+                        <option value="1">Theoretical</option>
+                        <option value="3">Difficult</option>
+                        <option value="5">Easy</option>
+                        <option value="9">Automated Tools available</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="aware">Awareness</label>
+                    <select id="aware" class="form-control" onchange="calc_score()">
+                        <option value="1">Unknown</option>
+                        <option value="4">Hidden</option>
+                        <option value="6">Obvious</option>
+                        <option value="9">Public Knowledge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="intrude">Intrusion Detection</label>
+                    <select id="intrude" class="form-control" onchange="calc_score()">
+                        <option value="1">Active Detection In Application</option>
+                        <option value="4">Logged And Reviewed</option>
+                        <option value="8">Logged Without Review</option>
+                        <option value="9">Not Logged</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <h4>Technical Impact Factors</h4>
+                <div class="form-group">
+                    <label for="loc">Loss Of Confidentiality</label>
+                    <select id="loc" class="form-control" onchange="calc_score()">
+                        <option value="2">Minimal non-sensitive data disclosed</option>
+                        <option value="6">Minimal critical data disclosed</option>
+                        <option value="6">Extensive non-sensitive data disclosed</option>
+                        <option value="7">Extensive critical data disclosed</option>
+                        <option value="9">All Data Disclosed</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="loi">Loss Of Integrity</label>
+                    <select id="loi" class="form-control" onchange="calc_score()">
+                        <option value="1">Minimal Slightly Corrupt Data</option>
+                        <option value="3">Minimal Seriously Corrupt Data</option>
+                        <option value="5">Extensive Slightly Corrupt Data</option>
+                        <option value="7">Extensive Seriously Corrupt Data</option>
+                        <option value="9">All Data Totally Corrupt</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="loa">Loss Of Availability</label>
+                    <select id="loa" class="form-control" onchange="calc_score()">
+                        <option value="1">Minimal Secondary Services Interrupted</option>
+                        <option value="5">Minimal Primary Services Interrupted</option>
+                        <option value="5">Extensive Secondary Services Interrupted</option>
+                        <option value="7">Extensive Primary Services Interrupted</option>
+                        <option value="9">All Services Completely Lost</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="loacc">Loss of Accountability</label>
+                    <select id="loacc" class="form-control" onchange="calc_score()">
+                        <option value="1">Fully Traceable</option>
+                        <option value="7">Possibly Traceable</option>
+                        <option value="9">Completely Anonymous</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <h4>Business Impact Factors</h4>
+                <div class="form-group">
+                    <label for="finan">Financial damage</label>
+                    <select id="finan" class="form-control" onchange="calc_score()">
+                        <option value="1">Less Than The Cost To Fix The Vulnerability</option>
+                        <option value="3">Minor Effect On Annual Profit</option>
+                        <option value="7">Significant Effect On Annual Profit</option>
+                        <option value="9">Bankruptcy</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="reput">Reputation Damage</label>
+                    <select id="reput" class="form-control" onchange="calc_score()">
+                        <option value="1">Minimal Damage</option>
+                        <option value="4">Loss Of Major Accounts</option>
+                        <option value="5">Loss Of Goodwill</option>
+                        <option value="9">Brand Damage</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="comply">Non-compliance</label>
+                    <select id="comply" class="form-control" onchange="calc_score()">
+                        <option value="2">Minor Violation</option>
+                        <option value="5">Clear Violation</option>
+                        <option value="7">High Profile Violation</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="priv">Privacy Violation</label>
+                    <select id="priv" class="form-control" onchange="calc_score()">
+                        <option value="2">One Individual</option>
+                        <option value="5">Hundreds Of People</option>
+                        <option value="7">Thousands Of People</option>
+                        <option value="9">Millions Of People</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calc_score() {
+            var sl = parseInt(document.getElementById("sl").value);
+            var motive = parseInt(document.getElementById("motive").value);
+            var oppor = parseInt(document.getElementById("oppor").value);
+            var size = parseInt(document.getElementById("size").value);
+
+            var eod = parseInt(document.getElementById("eod").value);
+            var eoe = parseInt(document.getElementById("eoe").value);
+            var aware = parseInt(document.getElementById("aware").value);
+            var intrude = parseInt(document.getElementById("intrude").value);
+
+            var loc = parseInt(document.getElementById("loc").value);
+            var loi = parseInt(document.getElementById("loi").value);
+            var loa = parseInt(document.getElementById("loa").value);
+            var loacc = parseInt(document.getElementById("loacc").value);
+
+            var finan = parseInt(document.getElementById("finan").value);
+            var reput = parseInt(document.getElementById("reput").value);
+            var comply = parseInt(document.getElementById("comply").value);
+            var priv = parseInt(document.getElementById("priv").value);
+
+            var threat = (sl + motive + oppor + size) / 4;
+            var vuln = (eod + eoe + aware + intrude) / 4;
+            var tech = (loc + loi + loa + loacc) / 4;
+            var bus = (finan + reput + comply + priv) / 4;
+
+            var overall = (threat + vuln + tech + bus) / 4;
+
+            updateChart(threat, vuln, tech, bus, overall);
+        }
+
+        function updateChart(threat, vuln, tech, bus, overall) {
+            var ctx = document.getElementById('myChart').getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['Threat', 'Vulnerability', 'Technical Impact', 'Business Impact', 'Overall'],
+                    datasets: [{
+                        label: 'Risk Score',
+                        data: [threat, vuln, tech, bus, overall],
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scale: {
+                        ticks: { beginAtZero: true, min: 0, max: 10, stepSize: 2 }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
